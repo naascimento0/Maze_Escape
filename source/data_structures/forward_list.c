@@ -42,7 +42,7 @@ void forward_list_push_front(ForwardList *l, data_type data){
 
 void forward_list_push_back(ForwardList *l, data_type data){
 	Node *new = node_construct(data, NULL);
-	if(l->head == NULL)
+	if(l->last == NULL)
 		l->head = l->last = new;
 	else
 		l->last = l->last->next = new;
@@ -55,10 +55,15 @@ void forward_list_print(ForwardList *l, void (*print_fn)(data_type)){
 	while(aux != NULL){
 		print_fn(aux->value);
 		aux = aux->next;
+		if(aux != NULL)
+			printf(", ");
 	}
 }
 
 data_type forward_list_get(ForwardList *l, int i){
+	if(i < 0 || i >= l->size)
+		exit(printf("Error: forward_list_get(): index out of bounds."));
+	
 	Node *aux = l->head;
 	while(i--){
 		aux = aux->next;
@@ -69,17 +74,17 @@ data_type forward_list_get(ForwardList *l, int i){
 
 data_type forward_list_pop_front(ForwardList *l){
 	if(l->head == NULL)
-		return NULL;
+		exit(printf("Error: forward_list_pop_front(): list is empty."));
 
 	Node *aux = l->head;
 	data_type value = aux->value;
-	node_destroy(aux);
 	l->head = l->head->next;
+	node_destroy(aux);
+	l->size--;
 
 	if(l->head == NULL)
 		l->last = NULL;
 
-	l->size--;
 	return value;
 }
 
@@ -95,13 +100,10 @@ ForwardList* forward_list_reverse(ForwardList *l){
 }
 
 void forward_list_clear(ForwardList *l){
-	Node *aux = l->head;
-	while(aux != NULL){
-		Node *temp = aux;
-		aux = aux->next;
-		node_destroy(temp);
-		l->size--;
-	}
+	int list_size = l->size;
+	int i;
+	for(i = 0; i < list_size; i++)
+		forward_list_pop_front(l);
 }
 
 void forward_list_remove(ForwardList *l, data_type val){
@@ -134,6 +136,12 @@ void forward_list_remove(ForwardList *l, data_type val){
 }
 
 void forward_list_destroy(ForwardList *l){
-	forward_list_clear(l);
+	Node *aux = l->head;
+	while(aux != NULL){
+		Node *temp = aux->next;
+		node_destroy(aux);
+		aux = temp;
+	}
+	
 	free(l);
 }
