@@ -2,12 +2,6 @@
 #include <stdio.h>
 #include "forward_list.h"
 
-struct forward{
-    Node *head;
-    Node *last;
-    int size;
-};
-
 ForwardList* forward_list_construct(){
     ForwardList *l = malloc(sizeof(ForwardList));
     l->head = l->last = NULL;

@@ -2,7 +2,11 @@
 #define FORWARD_LIST_H_
 #include "node.h"
 
-typedef struct forward ForwardList;
+typedef struct{
+    Node *head;
+    Node *last;
+    int size;
+}ForwardList;
 
 ForwardList* forward_list_construct();
 
