@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "deque.h"
 
 struct deque{
@@ -24,29 +25,17 @@ Deque *deque_construct(void){
 	return d;
 }
 
-//Deque* deque_construct(void){
-//	Deque *d = malloc(sizeof(Deque));
-//	d->blocks_amount = INITIAL_BLOCK_COUNT;
-//	d->front_block = d->rear_block = INITIAL_BLOCK_COUNT / 2;
-//	d->front = d->rear = 0;
-//	d->data = calloc(BLOCK_SIZE, sizeof(deque_type*));
-//	d->data_amount = 0;
-//
-//	int i;
-//	for(i = 0; i < d->blocks_amount; i++){
-//		d->data[i] = calloc(BLOCK_SIZE, sizeof(deque_type));
-//	}
-//
-//	return d;
-//}
-
 void deque_push_back(Deque *d, void *value){
 	if(!d->rear){
-		d->rear_block++; //verificar se e o ultimo bloco para assim jogar pro centro
+		if(d->rear_block + 1 >= d->blocks_amount)
+			deque_data_move(d);
+
+		d->rear_block++;
 		if(d->data[d->rear_block] == NULL)
 			d->data[d->rear_block] = calloc(BLOCK_SIZE, sizeof(deque_type));
-		d->data[d->rear_block][d->rear] = value;
-		d->rear++;
+			d->data[d->rear_block][d->rear] = value;
+			d->rear++;
+
 	}else if(d->rear == BLOCK_SIZE - 1){
 		d->data[d->rear_block][d->rear] = value;
 		d->rear = 0;
@@ -54,13 +43,15 @@ void deque_push_back(Deque *d, void *value){
 	}else
 		d->data[d->rear_block][d->rear++] = value;
 
-
 	d->data_amount++;
 }
 
 void deque_push_front(Deque *d, void *value){
 	if(!d->front){
-		d->front_block--; //verificar se precisa de jogar pro centro ou realloc
+		if(d->front_block - 1 < 0)
+			deque_data_move(d);
+
+		d->front_block--;
 		if(d->data[d->front_block] == NULL){
 			d->data[d->front_block] = calloc(BLOCK_SIZE, sizeof(deque_type));
 			d->front = BLOCK_SIZE - 1;
@@ -73,15 +64,61 @@ void deque_push_front(Deque *d, void *value){
 	d->data_amount++;
 }
 
-void *deque_pop_back(Deque *d){
-
-
-}
-void *deque_pop_front(Deque *d){
-
-}
-
 
 void deque_data_move(Deque *d){
+	int index = d->front_block / 2;
+
+	if(!index && !d->front_block){
+		deque_type **new_data = calloc(d->blocks_amount + 2, sizeof(deque_type*));
+		if(new_data == NULL){
+			exit(printf("in 'deque_data_move' realloc error"));
+		}
+
+		int i, j;
+		for(i = 0, j = 1; i < d->blocks_amount; i++, j++){
+			new_data[j] = d->data[i];
+		}
+
+		d->blocks_amount += 2;
+		d->data = new_data;
+		d->front_block++;
+		d->rear_block++;
+
+	}else{
+		int i, j;
+		for(i = index, j = d->front_block; j < d->rear_block; i++, j++){
+			d->data[i] = d->data[j];
+		}
+
+		d->front_block = index;
+		d->rear_block -= index;
+	}
+}
+
+
+void* deque_pop_back(Deque *d){
+	deque_type pop_element;
+	int index = d->rear - 1;
+	if(index < 0){
+		pop_element = d->data[d->rear_block][BLOCK_SIZE - 1];
+		d->data[d->rear_block][BLOCK_SIZE - 1] = NULL;
+		d->rear = BLOCK_SIZE - 1;
+
+	}else if(!index){
+		pop_element = d->data[d->rear_block][--d->rear];
+		free(d->data[d->rear_block]);
+		d->rear_block--;
+
+	}else{
+		pop_element = d->data[d->rear_block][--d->rear];
+		d->data[d->rear_block][d->rear] = NULL;
+	}
+
+	return pop_element;
+}
+
+void* deque_pop_front(Deque *d){
 
 }
+
+
