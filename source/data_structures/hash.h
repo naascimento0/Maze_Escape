@@ -16,7 +16,7 @@ typedef struct{
 
 HashTable* hash_table_construct(int table_size, HashFunction hash_fun, CmpFunction cmp_fun);
 
-void* hash_table_set(HashTable *h, void *key, void *val);
+void* hash_table_set(HashTable *h, void *key, void *value);
 
 void* hash_table_get(HashTable *h, void *key);
 
