@@ -47,6 +47,8 @@ int main()
 
     for (i = 0; i < n; i++)
     {
+    	static int count = 0;
+    	printf("%d:\n", count);
         scanf("\n%s", cmd);
 
         if (!strcmp(cmd, "PUSH_BACK"))
@@ -71,6 +73,8 @@ int main()
             printf("%d %d\n", c->x, c->y);
             celula_free(c);
         }
+
+        count++;
     }
 
     deque_destroy(d);

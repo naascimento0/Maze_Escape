@@ -16,7 +16,8 @@ Deque *deque_construct(void){
 	Deque *d = malloc(sizeof(Deque));
 	d->blocks_amount = INITIAL_BLOCK_COUNT;
 	d->front_block = d->rear_block = INITIAL_BLOCK_COUNT / 2;
-	d->front = d->rear = 0;
+	d->front = 0;
+	d->rear = -1;
 	d->data = calloc(INITIAL_BLOCK_COUNT, sizeof(deque_type*));
 	d->data[d->front_block] = calloc(BLOCK_SIZE, sizeof(deque_type));
 
@@ -32,14 +33,18 @@ void deque_push_back(Deque *d, void *value){
 		if(d->data[d->rear_block] == NULL)
 			d->data[d->rear_block] = calloc(BLOCK_SIZE, sizeof(deque_type));
 
-		d->data[d->rear_block][d->rear] = value;
-		d->rear++;
+		d->data[d->rear_block][d->rear++] = value;
 
 	}else if(d->rear == BLOCK_SIZE - 1){
 		d->data[d->rear_block][d->rear] = value;
 		d->rear = 0;
 
-	}else
+	}else if(d->rear == -1){ //isso teoricamente dá certo, mas quando eu der varios push_backs e depois varios
+		//pop backs deixando a lista vazia, o d->rear nao vai estar em -1;
+		d->data[d->rear_block][d->front_block] = value;
+		d->rear = 1;
+	}
+	else
 		d->data[d->rear_block][d->rear++] = value;
 }
 
@@ -47,6 +52,12 @@ void deque_push_front(Deque *d, void *value){
 	if(!d->front){
 		if(d->front_block - 1 < 0)
 			deque_data_move(d);
+
+		if(!deque_size(d)){
+			d->data[d->front_block][d->front] = value;
+			d->rear++;
+			return;
+		}
 
 		d->front_block--;
 		if(d->data[d->front_block] == NULL){
@@ -118,7 +129,7 @@ void* deque_pop_back(Deque *d){
 
 void* deque_pop_front(Deque *d){
 	if(!deque_size(d))
-		exit(printf("the deque is empty (deque_pop_back)"));
+		exit(printf("the deque is empty (deque_pop_front)"));
 
 	deque_type pop_element;
 	if(d->front == BLOCK_SIZE - 1){
@@ -151,9 +162,25 @@ void* deque_get(Deque *d, int idx){
 }
 
 void deque_destroy(Deque *d){
+//	int i;
+//	for(i = d->front_block; i <= d->rear_block; i++){
+//		int j;
+//		int data_amount = deque_size(d);
+//		for(j = d->front, j <)
+//	}
+//		free(d->data[i]);
+
 	int i;
-	for(i = d->front_block; i < d->rear_block; i++)
+	for(i = d->front_block; i <= d->rear_block; i++){
+
+		int j = i == d->front_block ? d->front : 0;
+		int limit = i == d->rear_block ? d->rear : BLOCK_SIZE;
+		for(; j < limit; j++){
+			free(d->data[i][j]);
+		}
+
 		free(d->data[i]);
+	}
 
 	free(d->data);
 	free(d);
