@@ -76,7 +76,10 @@ int main()
 
         count++;
     }
-
+    printf("\n\n");
+    deque_display(d);
     deque_destroy(d);
+
+    printf("\nfinished!\n");
     return 0;
 }

@@ -88,7 +88,7 @@ void deque_push_front(Deque *d, void *value){
 
 void deque_data_move(Deque *d){
 
-	deque_display(d);
+	//deque_display(d);
 
 	int index = d->front_block / 2;
 
@@ -108,18 +108,21 @@ void deque_data_move(Deque *d){
 	}else{
 		int i, j;
 		deque_type **new_data = calloc(d->blocks_amount, sizeof(deque_type*));
-		for(i = index, j = d->front_block; j < d->rear_block; i++, j++){
+		for(i = index, j = d->front_block; j <= d->rear_block; i++, j++){
 			//d->data[i] = d->data[j]; //aqui está o erro
 			new_data[i] = d->data[j];
-
 		}
+
 
 		d->front_block = index;
 		d->rear_block -= index;
+		d->data = new_data;
 		//d->rear_block = index + (d->rear_block - d->front_block);
 	}
 
-	deque_display(d);
+	printf("\n\n");
+
+	//deque_display(d);
 }
 
 
