@@ -24,7 +24,7 @@ Deque *deque_construct(void){
 }
 
 void deque_push_back(Deque *d, void *value){
-	if(!d->rear){
+	if(!d->rear){ //LOGICA ESTA ERRADA QUANDO EU COLOCO O PRIMEIRO ELEMENTO
 		if(d->rear_block + 1 >= d->blocks_amount)
 			deque_data_move(d);
 

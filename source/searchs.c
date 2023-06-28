@@ -26,20 +26,20 @@ SearchResult search_result_create(){
     return sr;
 }
 
-SearchResult a_star_search(Maze *m, Cell start, Cell end){
-    SearchResult sr;
-    // TODO!
-    return sr;
-}
+// SearchResult a_star_search(Maze *m, Cell start, Cell end){
+//     SearchResult sr;
+//     // TODO!
+//     return sr;
+// }
 
-SearchResult breadth_first_search(Maze *m, Cell start, Cell end){
-    SearchResult sr;
-    // TODO!
-    return sr;
-}
+// SearchResult breadth_first_search(Maze *m, Cell start, Cell end){
+//     SearchResult sr;
+//     // TODO!
+//     return sr;
+// }
 
-SearchResult depth_first_search(Maze *m, Cell start, Cell end){
-    SearchResult sr;
-    // TODO!
-    return sr;
-}
+// SearchResult depth_first_search(Maze *m, Cell start, Cell end){
+//     SearchResult sr;
+//     // TODO!
+//     return sr;
+// }

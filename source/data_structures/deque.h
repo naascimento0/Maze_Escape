@@ -7,7 +7,7 @@ typedef void* deque_type;
 
 typedef struct deque Deque;
 
-Deque *deque_construct(void);
+Deque *deque_construct();
 
 void deque_push_back(Deque *d, void *value);
 
