@@ -10,7 +10,6 @@ struct deque{
 	int front;
 	int rear;
 	deque_type **data;
-	int data_amount;
 };
 
 Deque *deque_construct(void){
@@ -20,7 +19,6 @@ Deque *deque_construct(void){
 	d->front = d->rear = 0;
 	d->data = calloc(INITIAL_BLOCK_COUNT, sizeof(deque_type*));
 	d->data[d->front_block] = calloc(BLOCK_SIZE, sizeof(deque_type));
-	d->data_amount = 0;
 
 	return d;
 }
@@ -33,8 +31,9 @@ void deque_push_back(Deque *d, void *value){
 		d->rear_block++;
 		if(d->data[d->rear_block] == NULL)
 			d->data[d->rear_block] = calloc(BLOCK_SIZE, sizeof(deque_type));
-			d->data[d->rear_block][d->rear] = value;
-			d->rear++;
+
+		d->data[d->rear_block][d->rear] = value;
+		d->rear++;
 
 	}else if(d->rear == BLOCK_SIZE - 1){
 		d->data[d->rear_block][d->rear] = value;
@@ -42,8 +41,6 @@ void deque_push_back(Deque *d, void *value){
 
 	}else
 		d->data[d->rear_block][d->rear++] = value;
-
-	d->data_amount++;
 }
 
 void deque_push_front(Deque *d, void *value){
@@ -60,8 +57,6 @@ void deque_push_front(Deque *d, void *value){
 
 	}else
 		d->data[d->front_block][--d->front] = value;
-
-	d->data_amount++;
 }
 
 
@@ -97,6 +92,9 @@ void deque_data_move(Deque *d){
 
 
 void* deque_pop_back(Deque *d){
+	if(!deque_size(d))
+		exit(printf("the deque is empty (deque_pop_back)"));
+
 	deque_type pop_element;
 	int index = d->rear - 1;
 	if(index < 0){
@@ -106,7 +104,8 @@ void* deque_pop_back(Deque *d){
 
 	}else if(!index){
 		pop_element = d->data[d->rear_block][--d->rear];
-		free(d->data[d->rear_block]);
+		deque_type *block_to_free = d->data[d->rear_block];
+		free(block_to_free);
 		d->rear_block--;
 
 	}else{
@@ -118,7 +117,50 @@ void* deque_pop_back(Deque *d){
 }
 
 void* deque_pop_front(Deque *d){
+	if(!deque_size(d))
+		exit(printf("the deque is empty (deque_pop_back)"));
 
+	deque_type pop_element;
+	if(d->front == BLOCK_SIZE - 1){
+		pop_element = d->data[d->front_block][d->front];
+		deque_type *block_to_free = d->data[d->front_block];
+		free(block_to_free);
+		d->front = 0;
+		d->front_block++;
+
+	}else{
+		pop_element = d->data[d->front_block][d->front];
+		d->data[d->front_block][d->front++] = NULL;
+	}
+
+	return pop_element;
 }
+
+int deque_size(Deque *d){
+	return (d->rear_block - d->front_block) * BLOCK_SIZE + (d->rear - d->front);
+}
+
+void* deque_get(Deque *d, int idx){
+	if(idx >= 0 && idx < deque_size(d)){
+		int element_position = d->front + idx;
+		int block_position = element_position / BLOCK_SIZE;
+		return d->data[block_position][element_position % BLOCK_SIZE];
+	}
+
+	return NULL;
+}
+
+void deque_destroy(Deque *d){
+	int i;
+	for(i = d->front_block; i < d->rear_block; i++)
+		free(d->data[i]);
+
+	free(d->data);
+	free(d);
+}
+
+
+
+
 
 
