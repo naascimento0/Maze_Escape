@@ -19,10 +19,10 @@
 //     return 0;
 // }
 
-typedef struct
-{
-    int x, y;
-} Celula;
+//typedef struct
+//{
+//    int x, y;
+//} Celula;
 
 Celula *celula_create(int x, int y)
 {
