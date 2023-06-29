@@ -20,32 +20,8 @@ Deque *deque_construct(void){
 	d->rear = 0;
 	d->data = calloc(INITIAL_BLOCK_COUNT, sizeof(deque_type*));
 	d->data[d->front_block] = calloc(BLOCK_SIZE, sizeof(deque_type));
-
 	return d;
 }
-
-//void deque_push_back(Deque *d, void *value){
-//	if(!d->rear){ //LOGICA ESTA ERRADA QUANDO EU COLOCO O PRIMEIRO ELEMENTO
-//		if(d->rear_block + 1 >= d->blocks_amount)
-//			deque_data_move(d);
-//
-//		if(!deque_size(d)){
-//			d->data[d->rear_block][d->rear++] = value;
-//			return;
-//		}
-//
-//		d->rear_block++;
-//		if(d->data[d->rear_block] == NULL)
-//			d->data[d->rear_block] = calloc(BLOCK_SIZE, sizeof(deque_type));
-//
-//		d->data[d->rear_block][d->rear++] = value;
-//
-//	}else if(d->rear == BLOCK_SIZE - 1){
-//		d->data[d->rear_block][d->rear] = value;
-//		d->rear = 0;
-//	}else
-//		d->data[d->rear_block][d->rear++] = value;
-//}
 
 void deque_push_back(Deque *d, void *value){
 	if(d->rear >= BLOCK_SIZE){
@@ -87,9 +63,6 @@ void deque_push_front(Deque *d, void *value){
 
 
 void deque_data_move(Deque *d){
-
-	//deque_display(d);
-
 	int index = d->front_block / 2;
 
 	if(!index && !d->front_block){
@@ -109,7 +82,6 @@ void deque_data_move(Deque *d){
 		int i, j;
 		deque_type **new_data = calloc(d->blocks_amount, sizeof(deque_type*));
 		for(i = index, j = d->front_block; j <= d->rear_block; i++, j++){
-			//d->data[i] = d->data[j]; //aqui está o erro
 			new_data[i] = d->data[j];
 		}
 
@@ -118,10 +90,6 @@ void deque_data_move(Deque *d){
 		d->front_block = index;
 		d->data = new_data;
 	}
-
-	printf("\n\n");
-
-	//deque_display(d);
 }
 
 
@@ -138,8 +106,10 @@ void* deque_pop_back(Deque *d){
 
 	}else if(!index){
 		pop_element = d->data[d->rear_block][--d->rear];
-		deque_type *block_to_free = d->data[d->rear_block--];
-		free(block_to_free);
+		if(d->front_block != d->rear_block){
+			deque_type *block_to_free = d->data[d->rear_block--];
+			free(block_to_free);
+		}
 
 	}else{
 		pop_element = d->data[d->rear_block][--d->rear];
@@ -184,14 +154,6 @@ void* deque_get(Deque *d, int idx){
 }
 
 void deque_destroy(Deque *d){
-//	int i;
-//	for(i = d->front_block; i <= d->rear_block; i++){
-//		int j;
-//		int data_amount = deque_size(d);
-//		for(j = d->front, j <)
-//	}
-//		free(d->data[i]);
-
 	int i;
 	for(i = d->front_block; i <= d->rear_block; i++){
 
