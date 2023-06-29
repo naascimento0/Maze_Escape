@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "source/maze.h"
+//#include "source/maze.h"
 #include "source/data_structures/deque.h"
 
 // int main()
@@ -19,10 +19,10 @@
 //     return 0;
 // }
 
-//typedef struct
-//{
-//    int x, y;
-//} Celula;
+typedef struct
+{
+    int x, y;
+} Celula;
 
 Celula *celula_create(int x, int y)
 {
@@ -41,15 +41,13 @@ int main()
 {
     int i, n, x, y;
     char cmd[10];
-    Deque *d = deque_construct();
+    Deque *d = deque_create();
 
     scanf("%d", &n);
 
     for (i = 0; i < n; i++)
     {
-    	static int count = 0;
         scanf("\n%s", cmd);
-        printf("%d: %s:  ", count, cmd);
 
         if (!strcmp(cmd, "PUSH_BACK"))
         {
@@ -73,15 +71,8 @@ int main()
             printf("%d %d\n", c->x, c->y);
             celula_free(c);
         }
-
-        printf("\n");
-
-        count++;
     }
-    printf("\n\n");
-    deque_display(d);
-    deque_destroy(d);
 
-    printf("\nfinished!\n");
+    deque_destroy(d);
     return 0;
 }
