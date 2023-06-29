@@ -113,11 +113,10 @@ void deque_data_move(Deque *d){
 			new_data[i] = d->data[j];
 		}
 
-
+		free(d->data);
+		d->rear_block = index + (d->rear_block - d->front_block);
 		d->front_block = index;
-		d->rear_block -= index;
 		d->data = new_data;
-		//d->rear_block = index + (d->rear_block - d->front_block);
 	}
 
 	printf("\n\n");
