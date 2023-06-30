@@ -97,30 +97,30 @@ void deque_push_front(Deque *d, void *value){
 }
 
 void deque_data_move(Deque *d){
-	if(!(d->front / 2) && d->rear == d->blocks_amount - 1){
+	if(!(d->front_block / 2) && d->rear_block == d->blocks_amount - 1){
 		deque_type **new_data = calloc(d->blocks_amount * 2, sizeof(deque_type*));
 
 		d->blocks_amount *= 2;
 		int aux = d->rear_block - d->front_block;
-		d->front_block = d->blocks_amount / 2;
-		d->rear_block = d->front_block + aux;
+		d->front_block = d->blocks_amount / 4; //MOODIFIQUEI
 
 		int i, j;
 		for(i = 0, j = d->front_block; i <= d->rear_block; i++, j++){
 			new_data[j] = d->data[i];
 		}
 
+		d->rear_block = d->front_block + aux;
 		free(d->data);
 		d->data = new_data;
 
 	}else{
 		deque_type **new_data = calloc(d->blocks_amount, sizeof(deque_type*));
 		int new_center;
-		if(d->front / 2){
-			new_center = d->front / 2;
+		if(d->front_block / 2){
+			new_center = d->front_block / 2;
 
-		}else if(d->rear < d->blocks_amount - 1){
-			new_center = d->rear / 2;
+		}else if(d->rear_block < d->blocks_amount - 1){
+			new_center = d->blocks_amount / 2;
 		}
 
 		int i, j;
@@ -174,7 +174,9 @@ void* deque_pop_back(Deque *d){
 	if(!d->rear){
 		d->rear = BLOCK_SIZE - 1;
 		pop_element = d->data[--d->rear_block][d->rear];
-		free(d->data[d->rear_block + 1]); //ainda estou perdido nisto aqui
+		free(d->data[d->rear_block + 1]);
+		d->data[d->rear_block + 1] = NULL;
+		//ainda estou perdido nisto aqui
 		//pode ser que o free dê merda, mas tudo bem
 	}else
 		pop_element = d->data[d->rear_block][--d->rear];
