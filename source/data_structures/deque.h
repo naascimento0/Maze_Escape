@@ -27,10 +27,10 @@ void deque_destroy(Deque *d);
 
 void deque_display(Deque *d);
 
-typedef struct
-{
-    int x, y;
-} Celula;
+//typedef struct
+//{
+//    int x, y;
+//} Celula;
 
 
 #endif

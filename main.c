@@ -41,7 +41,7 @@ int main()
 {
     int i, n, x, y;
     char cmd[10];
-    Deque *d = deque_create();
+    Deque *d = deque_construct();
 
     scanf("%d", &n);
 

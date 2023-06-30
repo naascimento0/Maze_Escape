@@ -2,4 +2,4 @@ CC = gcc
 
 all:
 	$(CC) main.c source/*.c source/data_structures/*.c -o exec -Wall
-	./exec
+	valgrind --leak-check=full ./exec <in/in5.txt

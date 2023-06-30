@@ -76,9 +76,14 @@ void deque_push_back(Deque *d, void *value){
 //}
 
 void deque_push_front(Deque *d, void *value){
-	if(d->front < 1){
-		if(d->front_block < 1)
+	if(!d->front){
+		if(!d->front_block)
 			deque_data_move(d);
+		if(d->data[d->front_block][d->front] == NULL){
+			d->data[d->front_block][d->front] = value;
+			d->rear = (d->rear == d->front) && (d->rear_block == d->front_block) ? d->rear + 1 : d->rear;
+			return;
+		}
 
 		d->front_block--;
 		if(d->data[d->front_block] == NULL)
@@ -88,7 +93,7 @@ void deque_push_front(Deque *d, void *value){
 		d->data[d->front_block][d->front] = value;
 
 	}else
-		d->data[d->front_block][d->front--] = value;
+		d->data[d->front_block][--d->front] = value;
 }
 
 void deque_data_move(Deque *d){
@@ -105,6 +110,7 @@ void deque_data_move(Deque *d){
 			new_data[j] = d->data[i];
 		}
 
+		free(d->data);
 		d->data = new_data;
 
 	}else{
@@ -122,10 +128,10 @@ void deque_data_move(Deque *d){
 			new_data[i] = d->data[j];
 		}
 
+		free(d->data);
 		d->rear_block = new_center + (d->rear_block - d->front_block);
 		d->front_block = new_center;
 		d->data = new_data;
-
 	}
 }
 
@@ -173,6 +179,9 @@ void* deque_pop_back(Deque *d){
 	}else
 		pop_element = d->data[d->rear_block][--d->rear];
 
+	if(!deque_size(d))
+		d->front = d->rear = 0;
+
 	d->data[d->rear_block][d->rear] = NULL;
 	return pop_element;
 }
@@ -211,33 +220,43 @@ void* deque_pop_front(Deque *d){
 	deque_type pop_element;
 
 	if(d->front == BLOCK_SIZE - 1){
-		pop_element = d->data[d->front_block++][d->front--];
-		d->front = 0;
-	}else
-		pop_element = d->data[d->front_block][d->front--];
-
-	return pop_element;
-}
-
-void* deque_pop_front(Deque *d){
-	if(!deque_size(d))
-		exit(printf("the deque is empty (deque_pop_front)"));
-
-	deque_type pop_element;
-	if(d->front == BLOCK_SIZE - 1){
 		pop_element = d->data[d->front_block][d->front];
-		deque_type *block_to_free = d->data[d->front_block];
-		free(block_to_free);
+		d->data[d->front_block++][d->front] = NULL;
+		free(d->data[d->front_block - 1]);
+		d->data[d->front_block - 1] = NULL;
 		d->front = 0;
-		d->front_block++;
-
 	}else{
 		pop_element = d->data[d->front_block][d->front];
 		d->data[d->front_block][d->front++] = NULL;
 	}
 
+	if(!deque_size(d)){
+		d->front = d->rear = 0;
+		d->data[d->front_block][d->front] = NULL;
+	}
+
 	return pop_element;
 }
+
+//void* deque_pop_front(Deque *d){
+//	if(!deque_size(d))
+//		exit(printf("the deque is empty (deque_pop_front)"));
+//
+//	deque_type pop_element;
+//	if(d->front == BLOCK_SIZE - 1){
+//		pop_element = d->data[d->front_block][d->front];
+//		deque_type *block_to_free = d->data[d->front_block];
+//		free(block_to_free);
+//		d->front = 0;
+//		d->front_block++;
+//
+//	}else{
+//		pop_element = d->data[d->front_block][d->front];
+//		d->data[d->front_block][d->front++] = NULL;
+//	}
+//
+//	return pop_element;
+//}
 
 int deque_size(Deque *d){
 	return (d->rear_block - d->front_block) * BLOCK_SIZE + (d->rear - d->front);
@@ -270,21 +289,21 @@ void deque_destroy(Deque *d){
 	free(d);
 }
 
-void deque_display(Deque *d){
-	int i;
-	for(i = d->front_block; i <= d->rear_block; i++){
-		printf("BLOCK %d: ", i);
-
-		int j = i == d->front_block ? d->front : 0;
-		int limit = i == d->rear_block ? d->rear : BLOCK_SIZE;
-		for(; j < limit; j++){
-			Celula *c = d->data[i][j];
-			printf("%d %d, ", c->x, c->y);
-		}
-
-		printf("\n");
-	}
-}
+//void deque_display(Deque *d){
+//	int i;
+//	for(i = d->front_block; i <= d->rear_block; i++){
+//		printf("BLOCK %d: ", i);
+//
+//		int j = i == d->front_block ? d->front : 0;
+//		int limit = i == d->rear_block ? d->rear : BLOCK_SIZE;
+//		for(; j < limit; j++){
+//			Celula *c = d->data[i][j];
+//			printf("%d %d, ", c->x, c->y);
+//		}
+//
+//		printf("\n");
+//	}
+//}
 
 
 
