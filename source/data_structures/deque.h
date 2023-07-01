@@ -1,6 +1,6 @@
 #ifndef DEQUE_H_
 #define DEQUE_H_
-#define BLOCK_SIZE 3
+#define BLOCK_SIZE 5
 #define INITIAL_BLOCK_COUNT 5
 
 typedef void* deque_type;
@@ -24,13 +24,5 @@ int deque_size(Deque *d);
 void* deque_get(Deque *d, int idx);
 
 void deque_destroy(Deque *d);
-
-void deque_display(Deque *d);
-
-//typedef struct
-//{
-//    int x, y;
-//} Celula;
-
 
 #endif
