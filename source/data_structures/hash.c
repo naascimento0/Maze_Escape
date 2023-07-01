@@ -109,6 +109,26 @@ void hash_table_destroy(HashTable *h){
 	free(h);
 }
 
+struct HashTableIterator{
+	HashTable *current;
+};
 
+HashTableIterator *hash_table_iterator(HashTable *h){
+	HashTableIterator *it = malloc(sizeof(HashTableIterator));
+	it->current = h;
+	return it;
+}
+
+int hash_table_iterator_is_over(HashTableIterator *it){
+
+}
+
+HashTableItem *hash_table_iterator_next(HashTableIterator *it){
+
+}
+
+void hash_table_iterator_destroy(HashTableIterator *it){
+	free(it);
+}
 
 

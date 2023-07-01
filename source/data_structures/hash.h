@@ -12,7 +12,7 @@ typedef struct{
 	void *value;
 }HashTableItem;
 
-//hashtable iterator
+typedef struct HashTableIterator HashTableIterator;
 
 HashTable* hash_table_construct(int table_size, HashFunction hash_fun, CmpFunction cmp_fun);
 
@@ -27,5 +27,13 @@ int hash_table_size(HashTable *h);
 int hash_table_num_elems(HashTable *h);
 
 void hash_table_destroy(HashTable *h);
+
+HashTableIterator *hash_table_iterator(HashTable *h);
+
+int hash_table_iterator_is_over(HashTableIterator *it);
+
+HashTableItem *hash_table_iterator_next(HashTableIterator *it);
+
+void hash_table_iterator_destroy(HashTableIterator *it);
 
 #endif
