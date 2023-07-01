@@ -25,7 +25,7 @@ HashTable* hash_table_construct(int table_size, HashFunction hash_fun, CmpFuncti
 }
 
 void* hash_table_set(HashTable *h, void *key, void *value){
-    int index = h->hash_fun(h, key);
+    int index = h->hash_fun(h, key) % h->table_size;
     ForwardList *bucket = h->buckets[index];
     if(bucket == NULL){
         bucket = forward_list_construct();
@@ -50,7 +50,7 @@ void* hash_table_set(HashTable *h, void *key, void *value){
 }
 
 void* hash_table_get(HashTable *h, void *key){
-	int index = h->hash_fun(h, key);
+	int index = h->hash_fun(h, key) % h->table_size;
 	ForwardList *bucket = h->buckets[index];
 	if(bucket == NULL)
 		return NULL;
@@ -110,21 +110,48 @@ void hash_table_destroy(HashTable *h){
 }
 
 struct HashTableIterator{
-	HashTable *current;
+	HashTable *hashtable;
+	int curr_bucket;
+	Node *current_node;
 };
 
 HashTableIterator *hash_table_iterator(HashTable *h){
 	HashTableIterator *it = malloc(sizeof(HashTableIterator));
-	it->current = h;
+	it->hashtable = h;
+	it->curr_bucket = 0;
+	it->current_node = NULL;
 	return it;
 }
 
 int hash_table_iterator_is_over(HashTableIterator *it){
-
+	return it->curr_bucket >= it->hashtable->table_size && it->current_node == NULL;
 }
 
 HashTableItem *hash_table_iterator_next(HashTableIterator *it){
+	if(hash_table_iterator_is_over(it))
+		return NULL;
 
+	if(it->current_node == NULL){
+		while((it->curr_bucket < it->hashtable->table_size) && (it->hashtable->buckets[it->curr_bucket] == NULL))
+			it->curr_bucket++;
+
+		if(it->curr_bucket < it->hashtable->table_size)
+			it->current_node = it->hashtable->buckets[it->curr_bucket]->head;
+	}else
+		it->current_node = it->current_node->next;
+
+
+	while(it->curr_bucket < it->hashtable->table_size && it->current_node == NULL){
+		it->curr_bucket++;
+		if((it->curr_bucket < it->hashtable->table_size) && (it->hashtable->buckets[it->curr_bucket] != NULL))
+			it->current_node = it->hashtable->buckets[it->curr_bucket]->head;
+	}
+
+	if(it->current_node == NULL)
+		return NULL;
+
+    HashTableItem *item = (HashTableItem*)it->current_node->value;
+    return item;
 }
 
 void hash_table_iterator_destroy(HashTableIterator *it){

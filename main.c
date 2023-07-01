@@ -1,29 +1,30 @@
 //#include <stdlib.h>
 //#include <stdio.h>
 //#include <string.h>
-////#include "source/maze.h"
+//#include "source/maze.h"
 //#include "source/data_structures/deque.h"
 //
-//// int main()
-//// {
-////     char maze_file[100];
-//
-////     scanf("%s", maze_file);
-//
-////     Maze *m = maze_load(maze_file);
-//
-////     maze_display(m);
-//
-////     maze_destroy(m);
-//
-////     return 0;
-//// }
+// int main()
+// {
+//     char maze_file[100];
+
+//     scanf("%s", maze_file);
+
+//     Maze *m = maze_load(maze_file);
+
+//     maze_display(m);
+
+//     maze_destroy(m);
+
+//     return 0;
+// }
 
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "hash.h"
+//#include "hash.h"
+#include "source/data_structures/hash.h"
 
 typedef struct
 {
@@ -104,7 +105,7 @@ int main()
     {
         HashTableItem *item = hash_table_iterator_next(it);
         Celula *cel = (Celula *)item->key;
-        int *pos = (int *)item->val;
+        int *pos = (int *)item->value;
         celula_destroy(cel);
         free(pos);
     }
