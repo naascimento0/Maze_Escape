@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "heap.h"
+#include "source/data_structures/heap.h"
 
 typedef struct
 {
@@ -100,7 +100,7 @@ int main()
     {
         HashTableItem *item = hash_table_iterator_next(it);
         Celula *cel = (Celula *)item->key;
-        int *pos = (int *)item->val;
+        int *pos = (int *)item->value;
         celula_destroy(cel);
         free(pos);
     }
