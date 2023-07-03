@@ -1,7 +1,7 @@
 #ifndef NODE_H_
 #define NODE_H_
 
-typedef void *data_type;
+typedef void* data_type;
 
 typedef struct node{
     data_type value;

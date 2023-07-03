@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "forward_list.h"
+#include "hash.h"
 
 ForwardList* forward_list_construct(){
     ForwardList *l = malloc(sizeof(ForwardList));
@@ -16,7 +17,7 @@ int forward_list_size(ForwardList *l){
 data_type forward_list_find(ForwardList *l, void *key, int (*cmp_fn)(data_type data, void *key)){
 	Node *aux = l->head;
 	while(aux != NULL){
-		if(cmp_fn(key, aux->value))
+		if(!cmp_fn(key, return_hash_item_key(aux->value)))
 			return aux->value;
 		aux = aux->next;
 	}
@@ -25,13 +26,10 @@ data_type forward_list_find(ForwardList *l, void *key, int (*cmp_fn)(data_type d
 }
 
 void forward_list_push_front(ForwardList *l, data_type data){
-	Node *new = node_construct(data, l->head);
-	if(l->head == NULL)
-		l->head = l->last = new;
-	else
-		l->head = new;
-
+	l->head = node_construct(data, l->head);
 	l->size++;
+	if(l->size == 1)
+		l->last = l->head;
 }
 
 void forward_list_push_back(ForwardList *l, data_type data){

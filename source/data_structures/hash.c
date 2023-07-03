@@ -14,6 +14,10 @@ void _hash_pair_destroy(HashTableItem *p){
     free(p);
 }
 
+void* return_hash_item_key(HashTableItem *item){
+	return item->key;
+}
+
 HashTable* hash_table_construct(int table_size, HashFunction hash_fun, CmpFunction cmp_fun){
     HashTable *hash_tbl = malloc(sizeof(HashTable));
     hash_tbl->table_size = table_size;
@@ -25,32 +29,34 @@ HashTable* hash_table_construct(int table_size, HashFunction hash_fun, CmpFuncti
 }
 
 void* hash_table_set(HashTable *h, void *key, void *value){
-    int index = h->hash_fun(h, key) % h->table_size;
+    int index = h->hash_fun(h, key);
     ForwardList *bucket = h->buckets[index];
     if(bucket == NULL){
-        bucket = forward_list_construct();
-        h->buckets[index] = bucket;
+    	bucket = forward_list_construct();
+    	h->buckets[index] = bucket;
     }
 
     void *old_value = NULL;
-    data_type found_item = forward_list_find(bucket, key, h->cmp_fun);
+    HashTableItem *new_pair = malloc(sizeof(HashTableItem));
+    new_pair->key = key;
+    new_pair->value = value;
+
+    data_type found_item = forward_list_find(bucket, new_pair, h->cmp_fun);
     if(found_item == NULL){
-        HashTableItem *new_pair = malloc(sizeof(HashTableItem));
-        new_pair->key = key;
-        new_pair->value = value;
     	forward_list_push_front(h->buckets[index], new_pair);
     	h->table_elements++;
     }else{
     	HashTableItem *aux = (HashTableItem*)found_item;
     	old_value = aux->value;
     	aux->value = value;
+    	_hash_pair_destroy(new_pair);
     }
 
     return old_value;
 }
 
 void* hash_table_get(HashTable *h, void *key){
-	int index = h->hash_fun(h, key) % h->table_size;
+	int index = h->hash_fun(h, key);
 	ForwardList *bucket = h->buckets[index];
 	if(bucket == NULL)
 		return NULL;
@@ -113,6 +119,7 @@ struct HashTableIterator{
 	HashTable *hashtable;
 	int curr_bucket;
 	Node *current_node;
+	int buckets_qtt;
 };
 
 HashTableIterator *hash_table_iterator(HashTable *h){
@@ -120,11 +127,12 @@ HashTableIterator *hash_table_iterator(HashTable *h){
 	it->hashtable = h;
 	it->curr_bucket = 0;
 	it->current_node = NULL;
+	it->buckets_qtt = h->table_elements;
 	return it;
 }
 
 int hash_table_iterator_is_over(HashTableIterator *it){
-	return it->curr_bucket >= it->hashtable->table_size && it->current_node == NULL;
+	return it->curr_bucket >= it->hashtable->table_size || !it->buckets_qtt;
 }
 
 HashTableItem *hash_table_iterator_next(HashTableIterator *it){
@@ -147,12 +155,15 @@ HashTableItem *hash_table_iterator_next(HashTableIterator *it){
 			it->current_node = it->hashtable->buckets[it->curr_bucket]->head;
 	}
 
+	it->buckets_qtt--;
+
 	if(it->current_node == NULL)
 		return NULL;
 
     HashTableItem *item = (HashTableItem*)it->current_node->value;
     return item;
 }
+
 
 void hash_table_iterator_destroy(HashTableIterator *it){
 	free(it);

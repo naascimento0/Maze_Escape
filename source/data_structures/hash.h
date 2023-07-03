@@ -36,4 +36,6 @@ HashTableItem *hash_table_iterator_next(HashTableIterator *it);
 
 void hash_table_iterator_destroy(HashTableIterator *it);
 
+void* return_hash_item_key(HashTableItem *item);
+
 #endif
