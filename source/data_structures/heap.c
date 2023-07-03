@@ -6,7 +6,7 @@ struct HeapNode{
 	heap_type data;
 	double priority;
 };
-//no hash table item guarda-se a celula(key) e o indice(value) do node no heap
+
 struct Heap{
 	HashTable *h;
 	int size;
@@ -23,33 +23,31 @@ Heap *heap_construct(HashTable *h){
 	return heap;
 }
 
-void* heap_push(Heap *heap, void *data, double priority){
+void* heap_push(Heap *heap, void *data, double priority){ //PROBLEMA NO INDICE QUE RETORNA DA HASH
 	if(heap->size >= heap->capacity){
 		heap->capacity *= 2;
 		heap->nodes = realloc(heap->nodes, heap->capacity * sizeof(HeapNode*));
 	}
 
-	int index = hash_table_get(heap->h, data);
+	int *index = hash_table_get(heap->h, data);
 	if(index == NULL){
-		hash_table_set(heap->h, data, heap->);
 		HeapNode *heap_node = malloc(sizeof(HeapNode));
 		heap_node->data = data;
 		heap_node->priority = priority;
+		int *aux = heap->size;
+		hash_table_set(heap->h, data, &(aux));
 		heap->nodes[heap->size++] = heap_node;
+		data = NULL;
+	}else{
+		if(priority < heap->nodes[(*index)]->priority)
+			heap->nodes[*(index)]->priority = priority;
 	}
-	else{
-		if(priority < (double*)value){
-			value = hash_table_set(heap->h, data, priority);
-
-		}
-	}
-
 
 	int i;
 	for(i = heap->size / 2 - 1; i >= 0; i--)
 		heap_heapify_up(heap, i);
 
-	return store;
+	return data;
 }
 
 void heap_heapify_up(Heap *heap, int parent){
@@ -62,16 +60,23 @@ void heap_heapify_up(Heap *heap, int parent){
 	int right_child = 2 * parent + 2;
 	int new_parent = parent;
 
-	if(heap->nodes[left_child]->priority < heap->nodes[parent]->priority && left_child < heap->size)
-		new_parent = left_child;
+	if(left_child < heap->size){
+		if(heap->nodes[left_child]->priority < heap->nodes[parent]->priority)
+			new_parent = left_child;
+	}
 
-	if(heap->nodes[right_child]->priority < heap->nodes[parent]->priority && right_child < heap->size)
-		new_parent = right_child;
+	if(right_child < heap->size){
+		if(heap->nodes[right_child]->priority < heap->nodes[parent]->priority)
+			new_parent = right_child;
+	}
 
 	if(new_parent != parent){
 		HeapNode *temp = heap->nodes[parent];
 		heap->nodes[parent] = heap->nodes[new_parent];
+		hash_table_set(heap->h, heap->nodes[parent]->data, parent);
 		heap->nodes[new_parent] = temp;
+		hash_table_set(heap->h, heap->nodes[new_parent]->data, new_parent);
+
 		heap_heapify_up(heap, parent);
 	}
 }
@@ -95,8 +100,8 @@ void *heap_pop(Heap *heap){
 	heap_type store = heap->nodes[0]->data;
 	free(heap->nodes[0]);
 
-	heap->nodes[0] = heap->nodes[heap->size];
-	heap->nodes[heap->size--] = NULL;
+	heap->nodes[0] = heap->nodes[--heap->size];
+	heap->nodes[heap->size] = NULL;
 
 	int i;
 	for(i = heap->size / 2 - 1; i >= 0; i--)

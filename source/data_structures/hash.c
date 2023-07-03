@@ -10,6 +10,10 @@ struct HashTable{
     int table_elements;
 };
 
+void _hash_pair_destroy(HashTableItem *p){
+    free(p);
+}
+
 HashTable* hash_table_construct(int table_size, HashFunction hash_fun, CmpFunction cmp_fun){
     HashTable *hash_tbl = malloc(sizeof(HashTable));
     hash_tbl->table_size = table_size;
@@ -159,11 +163,6 @@ HashTableItem *hash_table_iterator_next(HashTableIterator *it){
 
 void hash_table_iterator_destroy(HashTableIterator *it){
 	free(it);
-}
-
-
-void _hash_pair_destroy(HashTableItem *p){
-    free(p);
 }
 
 void* return_hash_item_key(HashTableItem *item){
