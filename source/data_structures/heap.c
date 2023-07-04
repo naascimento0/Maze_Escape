@@ -34,8 +34,10 @@ void* heap_push(Heap *heap, void *data, double priority){ //PROBLEMA NO INDICE Q
 		HeapNode *heap_node = malloc(sizeof(HeapNode));
 		heap_node->data = data;
 		heap_node->priority = priority;
-		int *aux = heap->size;
-		hash_table_set(heap->h, data, &(aux));
+
+		heap_type *aux = malloc(sizeof(int));
+		*(int*)aux = heap->size;
+		hash_table_set(heap->h, data, aux);
 		heap->nodes[heap->size++] = heap_node;
 		data = NULL;
 	}else{
@@ -73,9 +75,18 @@ void heap_heapify_up(Heap *heap, int parent){
 	if(new_parent != parent){
 		HeapNode *temp = heap->nodes[parent];
 		heap->nodes[parent] = heap->nodes[new_parent];
-		hash_table_set(heap->h, heap->nodes[parent]->data, parent);
+
+		int* parent_index = malloc(sizeof(int));
+		*parent_index = parent;
+
+		hash_table_set(heap->h, heap->nodes[parent]->data, parent_index);
+
 		heap->nodes[new_parent] = temp;
-		hash_table_set(heap->h, heap->nodes[new_parent]->data, new_parent);
+
+		int* new_parent_index = malloc(sizeof(int));
+		*new_parent_index = new_parent;
+
+		hash_table_set(heap->h, heap->nodes[new_parent]->data, new_parent_index);
 
 		heap_heapify_up(heap, parent);
 	}
@@ -93,12 +104,12 @@ double heap_min_priority(Heap *heap){
 	return heap->nodes[0] != NULL ? heap->nodes[0]->priority : 0;
 }
 
-void *heap_pop(Heap *heap){
+void *heap_pop(Heap *heap){ //TENHO QUE DAR UM HASH POP
 	if(!heap->size)
 		exit(printf("the heap is empty (heap_pop)"));
 
-	heap_type store = heap->nodes[0]->data;
-	free(heap->nodes[0]);
+	heap_type store = hash_table_pop(heap->h, heap->nodes[0]->data);
+	free(heap->nodes[0]); //retornar o celula
 
 	heap->nodes[0] = heap->nodes[--heap->size];
 	heap->nodes[heap->size] = NULL;
