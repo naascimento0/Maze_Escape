@@ -23,7 +23,7 @@ Heap *heap_construct(HashTable *h){
 	return heap;
 }
 
-void* heap_push(Heap *heap, void *data, double priority){ //PROBLEMA NO INDICE QUE RETORNA DA HASH
+void* heap_push(Heap *heap, void *data, double priority){ //PROBLEMA COM LEAK NESTA FUNCAO
 	if(heap->size >= heap->capacity){
 		heap->capacity *= 2;
 		heap->nodes = realloc(heap->nodes, heap->capacity * sizeof(HeapNode*));
@@ -38,6 +38,7 @@ void* heap_push(Heap *heap, void *data, double priority){ //PROBLEMA NO INDICE Q
 		heap_type *aux = malloc(sizeof(int));
 		*(int*)aux = heap->size;
 		hash_table_set(heap->h, data, aux);
+
 		heap->nodes[heap->size++] = heap_node;
 		data = NULL;
 	}else{
@@ -79,14 +80,16 @@ void heap_heapify_up(Heap *heap, int parent){
 		int* parent_index = malloc(sizeof(int));
 		*parent_index = parent;
 
-		hash_table_set(heap->h, heap->nodes[parent]->data, parent_index);
+		heap_type store = hash_table_set(heap->h, heap->nodes[parent]->data, parent_index);
+		//free(store); //AQUI O Q EU FACO?
 
 		heap->nodes[new_parent] = temp;
 
 		int* new_parent_index = malloc(sizeof(int));
 		*new_parent_index = new_parent;
 
-		hash_table_set(heap->h, heap->nodes[new_parent]->data, new_parent_index);
+		store = hash_table_set(heap->h, heap->nodes[new_parent]->data, new_parent_index);
+		//free(store);
 
 		heap_heapify_up(heap, parent);
 	}
@@ -104,13 +107,14 @@ double heap_min_priority(Heap *heap){
 	return heap->nodes[0] != NULL ? heap->nodes[0]->priority : 0;
 }
 
-void *heap_pop(Heap *heap){ //TENHO QUE DAR UM HASH POP
+void *heap_pop(Heap *heap){
 	if(!heap->size)
 		exit(printf("the heap is empty (heap_pop)"));
 
-	heap_type store = hash_table_pop(heap->h, heap->nodes[0]->data);
-	free(heap->nodes[0]); //retornar o celula
+	heap_type index = hash_table_pop(heap->h, heap->nodes[0]->data);
+	free(index);
 
+	heap_type store = heap->nodes[0]->data;
 	heap->nodes[0] = heap->nodes[--heap->size];
 	heap->nodes[heap->size] = NULL;
 

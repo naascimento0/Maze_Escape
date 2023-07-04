@@ -72,7 +72,7 @@ void* hash_table_pop(HashTable *h, void *key){
 	if(bucket == NULL)
 		return NULL;
 
-	void *pop_value = NULL;
+	data_type *pop_value = NULL;
 	data_type found_item = forward_list_find(bucket, key, h->cmp_fun);
 	if(found_item != NULL){
 		HashTableItem *aux = (HashTableItem*)found_item;
