@@ -101,7 +101,7 @@ double heap_min_priority(Heap *heap){
 
 void *heap_pop(Heap *heap){
 
-	printf("\n");
+	printf("\natual versao\n");
 	heap_display(heap); //MODIFICADO
 	printf("\n");
 
@@ -109,19 +109,21 @@ void *heap_pop(Heap *heap){
 		exit(printf("the heap is empty (heap_pop)"));
 
 	heap_type index = hash_table_pop(heap->h, heap->nodes[0]->data);
-	free(index);
 
 	heap_type store = heap->nodes[0]->data;
 	HeapNode *aux = heap->nodes[0];
 	free(aux);
-	heap->nodes[0] = NULL;
 
 	heap->nodes[0] = heap->nodes[--heap->size];
 	heap->nodes[heap->size] = NULL;
+	hash_table_set(heap->h, heap->nodes[0]->data, index); //verificar no heapify down se o indice esta certo
+	free(index);
 
-	int i;
-	for(i = heap->size / 2 - 1; i >= 0; i--)
-		heap_heapify_down(heap, i);
+	heap_heapify_down(heap, 0);
+
+	printf("\n");
+	heap_display(heap); //MODIFICADO
+	printf("\n");
 
 	return store;
 }
@@ -158,7 +160,7 @@ void heap_heapify_down(Heap *heap, int parent){
 		heap->nodes[parent] = heap->nodes[new_parent];
 		heap->nodes[new_parent] = temp;
 
-		heap_heapify_down(heap, parent);
+		heap_heapify_down(heap, new_parent);
 	}
 }
 
