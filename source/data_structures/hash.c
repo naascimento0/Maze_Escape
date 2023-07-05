@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "hash.h"
+#include "hash.h" //MANDAR HASH NOVAMENTE
 
 struct HashTable{
     ForwardList **buckets;
@@ -37,7 +37,7 @@ void* hash_table_set(HashTable *h, void *key, void *value){
     new_pair->key = key;
     new_pair->value = value;
 
-    data_type found_item = forward_list_find(bucket, new_pair, h->cmp_fun);
+    data_type found_item = forward_list_find(bucket, new_pair->key, h->cmp_fun); //MODIFIQUEI NEW PAIR TO NEW PAIR KEY
     if(found_item == NULL){
     	forward_list_push_front(h->buckets[index], new_pair);
     	h->table_elements++;

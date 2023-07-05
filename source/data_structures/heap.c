@@ -74,27 +74,14 @@ void heap_heapify_up(Heap *heap, int parent){
 	}
 
 	if(new_parent != parent){
-//		HeapNode *temp = heap->nodes[parent];
-//		heap->nodes[parent] = heap->nodes[new_parent];
-//		heap->nodes[new_parent] = temp;
-//		heap_heapify_up(heap, parent);
+
+		int *old_parent_index = hash_table_get(heap->h, heap->nodes[parent]->data);
+		int *new_parent_index = hash_table_set(heap->h, heap->nodes[new_parent]->data, old_parent_index);
+		hash_table_set(heap->h, heap->nodes[parent]->data, new_parent_index);
 
 		HeapNode *temp = heap->nodes[parent];
 		heap->nodes[parent] = heap->nodes[new_parent];
-
-		int* parent_index = malloc(sizeof(int));
-		*parent_index = parent;
-
-		heap_type store = hash_table_set(heap->h, heap->nodes[parent]->data, parent_index);
-		//free(store); //AQUI O Q EU FACO?
-
 		heap->nodes[new_parent] = temp;
-
-		int* new_parent_index = malloc(sizeof(int));
-		*new_parent_index = new_parent;
-
-		store = hash_table_set(heap->h, heap->nodes[new_parent]->data, new_parent_index);
-		//free(store);
 
 		heap_heapify_up(heap, parent);
 	}
