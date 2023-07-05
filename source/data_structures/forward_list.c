@@ -105,13 +105,13 @@ void forward_list_remove(ForwardList *l, data_type val){
 		if(current->value == val){
 			Node *aux = current;
 
-			if(previous != NULL){  // O nó a ser removido não é o primeiro da lista
+			if(previous != NULL){
 				previous->next = current->next;
-				if(current == l->last) // O nó a ser removido é o último da lista
+				if(current == l->last)
 					l->last = previous;
-			}else{ // O nó a ser removido é o primeiro da lista
+			}else{
 				l->head = current->next;
-				if(current == l->last){ // A lista ficou vazia
+				if(current == l->last){
 					l->last = NULL;
 				}
 			}

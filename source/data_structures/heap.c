@@ -23,7 +23,7 @@ Heap *heap_construct(HashTable *h){
 	return heap;
 }
 
-void* heap_push(Heap *heap, void *data, double priority){ //PROBLEMA COM LEAK NESTA FUNCAO
+void* heap_push(Heap *heap, void *data, double priority){
 	if(heap->size >= heap->capacity){
 		heap->capacity *= 2;
 		heap->nodes = realloc(heap->nodes, heap->capacity * sizeof(HeapNode*));
@@ -74,6 +74,11 @@ void heap_heapify_up(Heap *heap, int parent){
 	}
 
 	if(new_parent != parent){
+//		HeapNode *temp = heap->nodes[parent];
+//		heap->nodes[parent] = heap->nodes[new_parent];
+//		heap->nodes[new_parent] = temp;
+//		heap_heapify_up(heap, parent);
+
 		HeapNode *temp = heap->nodes[parent];
 		heap->nodes[parent] = heap->nodes[new_parent];
 

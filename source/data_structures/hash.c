@@ -78,6 +78,7 @@ void* hash_table_pop(HashTable *h, void *key){
 		HashTableItem *aux = (HashTableItem*)found_item;
 		pop_value = aux->value;
 		forward_list_remove(h->buckets[index], found_item);
+		_hash_pair_destroy(found_item);
 		h->table_elements--;
 	}
 
