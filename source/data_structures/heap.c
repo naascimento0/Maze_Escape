@@ -115,6 +115,10 @@ void *heap_pop(Heap *heap){
 	free(index);
 
 	heap_type store = heap->nodes[0]->data;
+	HeapNode *aux = heap->nodes[0];
+	free(aux);
+	heap->nodes[0] = NULL;
+
 	heap->nodes[0] = heap->nodes[--heap->size];
 	heap->nodes[heap->size] = NULL;
 
@@ -129,7 +133,6 @@ void heap_destroy(Heap *heap){
 
 	int i;
 	for(i = 0; i < heap->size; i++){
-		free(heap->nodes[i]->data);
 		free(heap->nodes[i]);
 	}
 
