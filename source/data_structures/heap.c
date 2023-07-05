@@ -116,8 +116,10 @@ void *heap_pop(Heap *heap){
 
 	heap->nodes[0] = heap->nodes[--heap->size];
 	heap->nodes[heap->size] = NULL;
-	hash_table_set(heap->h, heap->nodes[0]->data, index); //verificar no heapify down se o indice esta certo
-	free(index);
+	if(heap->size)
+		hash_table_set(heap->h, heap->nodes[0]->data, index);
+	else
+		free(index);
 
 	heap_heapify_down(heap, 0);
 
@@ -130,10 +132,8 @@ void *heap_pop(Heap *heap){
 
 
 void heap_heapify_down(Heap *heap, int parent){
-	if(heap->size == 1){
-		printf("Single element in the heap!");
+	if(heap->size <= 1)
 		return;
-	} //heap empty tambem?
 
 	int left_child = 2 * parent + 1;
 	int right_child = 2 * parent + 2;

@@ -61,7 +61,7 @@ int celula_cmp(void *c1, void *c2)
         return 1;
 }
 
-int main()
+int main() //verificar o arquivo /in/free para ver aonde esta faltando liberar (acho que e no int malloc)
 {
     int i, n, x, y, priority;
     char cmd[10];
