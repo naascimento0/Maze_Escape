@@ -105,6 +105,8 @@ int main()
         free(pos);
     }
 
+    //heap_display(heap);
+
     hash_table_iterator_destroy(it);
     heap_destroy(heap);
 

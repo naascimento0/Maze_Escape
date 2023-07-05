@@ -100,6 +100,11 @@ double heap_min_priority(Heap *heap){
 }
 
 void *heap_pop(Heap *heap){
+
+	printf("\n");
+	heap_display(heap); //MODIFICADO
+	printf("\n");
+
 	if(!heap->size)
 		exit(printf("the heap is empty (heap_pop)"));
 
@@ -116,9 +121,45 @@ void *heap_pop(Heap *heap){
 
 	int i;
 	for(i = heap->size / 2 - 1; i >= 0; i--)
-		heap_heapify_up(heap, i);
+		heap_heapify_down(heap, i);
 
 	return store;
+}
+
+
+void heap_heapify_down(Heap *heap, int parent){
+	if(heap->size == 1){
+		printf("Single element in the heap!");
+		return;
+	} //heap empty tambem?
+
+	int left_child = 2 * parent + 1;
+	int right_child = 2 * parent + 2;
+	int new_parent = parent;
+
+	if(right_child < heap->size){
+		if(heap->nodes[right_child]->priority < heap->nodes[parent]->priority)
+			new_parent = right_child;
+	}
+
+	if(left_child < heap->size){
+		if(heap->nodes[left_child]->priority < heap->nodes[parent]->priority){
+			new_parent = new_parent != parent ? ((heap->nodes[left_child]->priority < heap->nodes[right_child]->priority) ? left_child : new_parent) : left_child;
+		}
+	}
+
+	if(new_parent != parent){
+
+		int *old_parent_index = hash_table_get(heap->h, heap->nodes[parent]->data);
+		int *new_parent_index = hash_table_set(heap->h, heap->nodes[new_parent]->data, old_parent_index);
+		hash_table_set(heap->h, heap->nodes[parent]->data, new_parent_index);
+
+		HeapNode *temp = heap->nodes[parent];
+		heap->nodes[parent] = heap->nodes[new_parent];
+		heap->nodes[new_parent] = temp;
+
+		heap_heapify_down(heap, parent);
+	}
 }
 
 void heap_destroy(Heap *heap){
@@ -131,4 +172,11 @@ void heap_destroy(Heap *heap){
 	free(heap->nodes);
 	hash_table_destroy(heap->h);
 	free(heap);
+}
+
+void heap_display(Heap *heap){
+	int i;
+	for(i = 0; i < heap->size; i++){
+		printf("%d: %lf\n", i, heap->nodes[i]->priority);
+	}
 }

@@ -23,6 +23,10 @@ double heap_min_priority(Heap *heap);
 
 void *heap_pop(Heap *heap);
 
+void heap_heapify_down(Heap *heap, int parent);
+
 void heap_destroy(Heap *heap);
+
+void heap_display(Heap *heap);
 
 #endif
