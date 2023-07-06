@@ -57,7 +57,7 @@ void heap_heapify_up(Heap *heap, int parent){
 	if(heap->size == 1){
 		printf("Single element in the heap!");
 		return;
-	} //heap empty tambem?
+	}
 
 	int left_child = 2 * parent + 1;
 	int right_child = 2 * parent + 2;
@@ -74,7 +74,6 @@ void heap_heapify_up(Heap *heap, int parent){
 	}
 
 	if(new_parent != parent){
-
 		int *old_parent_index = hash_table_get(heap->h, heap->nodes[parent]->data);
 		int *new_parent_index = hash_table_set(heap->h, heap->nodes[new_parent]->data, old_parent_index);
 		hash_table_set(heap->h, heap->nodes[parent]->data, new_parent_index);
@@ -101,9 +100,12 @@ double heap_min_priority(Heap *heap){
 
 void *heap_pop(Heap *heap){
 
-	printf("\natual versao\n");
-	heap_display(heap); //MODIFICADO
-	printf("\n");
+	static int a = 0;
+	if(a < 20){
+		printf("\natual versao %d:\n", a++);
+		heap_display(heap); //MODIFICADO
+		printf("\n");
+	}
 
 	if(!heap->size)
 		exit(printf("the heap is empty (heap_pop)"));
@@ -116,16 +118,20 @@ void *heap_pop(Heap *heap){
 
 	heap->nodes[0] = heap->nodes[--heap->size];
 	heap->nodes[heap->size] = NULL;
-	if(heap->size)
-		hash_table_set(heap->h, heap->nodes[0]->data, index);
+	if(heap->size){
+		int *old_index = hash_table_set(heap->h, heap->nodes[0]->data, index);
+		free(old_index);
+	}
 	else
 		free(index);
 
 	heap_heapify_down(heap, 0);
 
-	printf("\n");
-	heap_display(heap); //MODIFICADO
-	printf("\n");
+	if(a < 20){
+		printf("versao nova\n");
+		heap_display(heap); //MODIFICADO
+		printf("\n");
+	}
 
 	return store;
 }
@@ -151,7 +157,6 @@ void heap_heapify_down(Heap *heap, int parent){
 	}
 
 	if(new_parent != parent){
-
 		int *old_parent_index = hash_table_get(heap->h, heap->nodes[parent]->data);
 		int *new_parent_index = hash_table_set(heap->h, heap->nodes[new_parent]->data, old_parent_index);
 		hash_table_set(heap->h, heap->nodes[parent]->data, new_parent_index);
