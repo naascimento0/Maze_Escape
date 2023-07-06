@@ -81,8 +81,6 @@ void heap_heapify_up(Heap *heap, int parent){
 		HeapNode *temp = heap->nodes[parent];
 		heap->nodes[parent] = heap->nodes[new_parent];
 		heap->nodes[new_parent] = temp;
-
-		heap_heapify_up(heap, parent);
 	}
 }
 
@@ -99,13 +97,6 @@ double heap_min_priority(Heap *heap){
 }
 
 void *heap_pop(Heap *heap){
-
-	static int a = 0;
-	if(a < 20){
-		printf("\natual versao %d:\n", a++);
-		heap_display(heap); //MODIFICADO
-		printf("\n");
-	}
 
 	if(!heap->size)
 		exit(printf("the heap is empty (heap_pop)"));
@@ -127,12 +118,6 @@ void *heap_pop(Heap *heap){
 
 	heap_heapify_down(heap, 0);
 
-	if(a < 20){
-		printf("versao nova\n");
-		heap_display(heap); //MODIFICADO
-		printf("\n");
-	}
-
 	return store;
 }
 
@@ -151,9 +136,8 @@ void heap_heapify_down(Heap *heap, int parent){
 	}
 
 	if(left_child < heap->size){
-		if(heap->nodes[left_child]->priority < heap->nodes[parent]->priority){
-			new_parent = new_parent != parent ? ((heap->nodes[left_child]->priority < heap->nodes[right_child]->priority) ? left_child : new_parent) : left_child;
-		}
+		if(heap->nodes[left_child]->priority < heap->nodes[parent]->priority)
+			new_parent = new_parent != parent ? ((heap->nodes[left_child]->priority <= heap->nodes[right_child]->priority) ? left_child : new_parent) : left_child;
 	}
 
 	if(new_parent != parent){

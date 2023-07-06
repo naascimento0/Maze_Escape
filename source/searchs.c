@@ -3,27 +3,14 @@
 #include <stdio.h>
 #include "searchs.h"
 
-struct cell{
-    int x;
-    int y;
-};
-
-struct searchresult{
-    Cell *path;
-    double path_cost;
-    int path_size;
-    int expanded_nodes;
-    int sucess;
-};
-
-SearchResult search_result_create(){
-    SearchResult sr;
-    sr.path = NULL;
-    sr.path_cost = 0;
-    sr.path_size = 0;
-    sr.expanded_nodes = 0;
-    sr.sucess = 0;
-    return sr;
+SearchResultData search_result_data_create(){
+	SearchResultData search_result;
+	search_result.path = NULL;
+	search_result.path_cost = 0;
+	search_result.path_size = 0;
+	search_result.expanded_nodes = 0;
+	search_result.sucess = 0;
+    return search_result;
 }
 
 // SearchResult a_star_search(Maze *m, Cell start, Cell end){

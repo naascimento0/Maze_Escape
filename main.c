@@ -1,112 +1,59 @@
-//#include <stdlib.h>
-//#include <stdio.h>
-//#include <string.h>
-//#include "source/maze.h"
-//#include "source/data_structures/deque.h"
-//
-// int main()
-// {
-//     char maze_file[100];
-
-//     scanf("%s", maze_file);
-
-//     Maze *m = maze_load(maze_file);
-
-//     maze_display(m);
-
-//     maze_destroy(m);
-
-//     return 0;
-// }
-
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include "source/data_structures/heap.h"
+#include "source/maze.h"
+#include "source/searchs.h"
 
-typedef struct
+void display_result(SearchResultData *search_result)
 {
-    int x, y;
-    float g, h;
-} Celula;
-
-Celula *celula_create(int x, int y)
-{
-    Celula *c = malloc(sizeof(Celula));
-    c->x = x;
-    c->y = y;
-    return c;
-}
-
-void celula_destroy(Celula *c)
-{
-    free(c);
-}
-
-int celula_hash(HashTable *h, void *key)
-{
-    Celula *c = (Celula *)key;
-    // 83 e 97 sao primos e o operador "^" é o XOR bit a bit
-    return ((c->x * 83) ^ (c->y * 97)) % hash_table_size(h);
-}
-
-int celula_cmp(void *c1, void *c2)
-{
-    Celula *a = (Celula *)c1;
-    Celula *b = (Celula *)c2;
-
-    if (a->x == b->x && a->y == b->y)
-        return 0;
-    else
-        return 1;
-}
-
-int main() //verificar o arquivo /in/free para ver aonde esta faltando liberar (acho que e no int malloc)
-{
-    int i, n, x, y, priority;
-    char cmd[10];
-
-    HashTable *h = hash_table_construct(19, celula_hash, celula_cmp);
-    Heap *heap = heap_construct(h);
-
-    scanf("%d", &n);
-
-    for (i = 0; i < n; i++)
+    if (!search_result->sucess)
     {
-        scanf("\n%s", cmd);
-
-        if (!strcmp(cmd, "PUSH"))
-        {
-            scanf("%d %d %d", &x, &y, &priority);
-            Celula *cel = celula_create(x, y);
-            cel = heap_push(heap, cel, priority);
-
-            // se a celula ja existia, lembre-se liberar a memoria alocada para a nova celula
-            if (cel)
-                celula_destroy(cel);
-        }
-        else if (!strcmp(cmd, "POP"))
-        {
-            int priority = heap_min_priority(heap);
-            Celula *cel = heap_pop(heap);
-            printf("%d %d %d\n", cel->x, cel->y, priority);
-            celula_destroy(cel);
-        }
+        printf("IMPOSSIBLE\n");
+        return;
     }
 
-    HashTableIterator *it = hash_table_iterator(h);
+    for (int i = 0; i < search_result->path_size; i++)
+        printf("%d %d\n", search_result->path[i].x, search_result->path[i].y);
 
-    while (!hash_table_iterator_is_over(it))
+    printf("%.2lf\n", search_result->path_cost);
+    printf("%d\n", search_result->path_size);
+    printf("%d\n", search_result->expanded_nodes);
+}
+
+void show_entire_path(Maze *m, SearchResultData *search, Cell inicio, Cell fim)
+{
+    if (search->sucess)
     {
-        HashTableItem *item = hash_table_iterator_next(it);
-        Celula *cel = (Celula *)item->key;
-        int *pos = (int *)item->value;
-        celula_destroy(cel);
-        free(pos);
+        for (int i = 0; i < search->path_size; i++)
+        	maze_set_cell(m, search->path[i].x, search->path[i].y, PATH);
     }
 
-    hash_table_iterator_destroy(it);
-    heap_destroy(heap);
+    maze_set_cell(m, inicio.x, inicio.y, START);
+    maze_set_cell(m, fim.x, fim.y, END);
+    maze_display(m);
+}
+
+int main()
+{
+    char maze_file[100];
+    char search[100];
+    Cell start, end;
+    SearchResultData search_result;
+    Maze *lab;
+
+    scanf("%s", maze_file);
+    scanf("%d %d", &start.x, &start.y);
+    scanf("%d %d", &end.x, &end.y);
+    scanf("\n%s", search);
+
+    lab = maze_load(maze_file);
+
+    //search_result = dummy_search(lab, start, end);
+    display_result(&search_result);
+    show_entire_path(lab, &search_result, start, end);
+
+    maze_destroy(lab);
+    if (search_result.path != NULL)
+        free(search_result.path);
 
     return 0;
 }

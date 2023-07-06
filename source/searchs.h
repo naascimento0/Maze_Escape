@@ -3,9 +3,21 @@
 
 #include "maze.h"
 
-typedef struct cell Cell;
+typedef struct{
+    int x;
+    int y;
+}Cell;
 
-typedef struct searchresult SearchResult;
+typedef struct{
+    Cell *path;
+    double path_cost;
+    int path_size;
+    int expanded_nodes;
+    int sucess;
+}SearchResultData;
+
+
+SearchResultData search_result_data_create();
 
 
 #endif
