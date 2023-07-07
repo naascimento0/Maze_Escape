@@ -19,11 +19,13 @@ SearchResultData search_result_data_create(){
 //     return sr;
 // }
 
-// SearchResult breadth_first_search(Maze *m, Cell start, Cell end){
-//     SearchResult sr;
-//     // TODO!
-//     return sr;
-// }
+SearchResultData breadth_first_search(Maze *m, Cell start, Cell end){
+	SearchResultData search_result;
+
+
+
+     return search_result;
+ }
 
 // SearchResult depth_first_search(Maze *m, Cell start, Cell end){
 //     SearchResult sr;

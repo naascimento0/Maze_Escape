@@ -19,7 +19,7 @@ void display_result(SearchResultData *search_result)
     printf("%d\n", search_result->expanded_nodes);
 }
 
-void show_entire_path(Maze *m, SearchResultData *search, Cell inicio, Cell fim)
+void show_entire_path(Maze *m, SearchResultData *search, Cell start, Cell end)
 {
     if (search->sucess)
     {
@@ -27,8 +27,8 @@ void show_entire_path(Maze *m, SearchResultData *search, Cell inicio, Cell fim)
         	maze_set_cell(m, search->path[i].x, search->path[i].y, PATH);
     }
 
-    maze_set_cell(m, inicio.x, inicio.y, START);
-    maze_set_cell(m, fim.x, fim.y, END);
+    maze_set_cell(m, start.x, start.y, START);
+    maze_set_cell(m, end.x, end.y, END);
     maze_display(m);
 }
 
