@@ -30,7 +30,7 @@ void show_entire_path(Maze *m, SearchResultData *search, Cell end, Cell start)
 
     maze_set_cell(m, start.y, start.x, START);
     maze_set_cell(m, end.y, end.x, END);
-    maze_display(m);
+    //maze_display(m);
 }
 
 int main()
@@ -50,8 +50,8 @@ int main()
 
     if (!strcmp(algorithm, "BFS"))
     	search_result = breadth_first_search(maze, start, end);
-//    else if (!strcmp(algorithm, "DFS"))
-//    	search_result = depth_first_search(maze, start, end);
+    else if (!strcmp(algorithm, "DFS"))
+    	search_result = depth_first_search(maze, start, end);
 //    else if (!strcmp(algorithm, "A*"))
 //    	search_result = a_star(maze, start, end);
     else
@@ -60,9 +60,6 @@ int main()
         exit(1);
     }
 
-    printf("\n");
-    maze_display(maze);
-    printf("\nRESULT:\n");
     display_result(&search_result);
     show_entire_path(maze, &search_result, start, end);
 

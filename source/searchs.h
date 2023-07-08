@@ -24,7 +24,10 @@ int cell_is_equal(Cell a, Cell b);
 
 Cell* cell_construct(int x, int y, void *parent);
 
+SearchResultData reverse_search_result_path(SearchResultData search_result);
+
 SearchResultData breadth_first_search(Maze *m, Cell start, Cell end);
 
+SearchResultData depth_first_search(Maze *m, Cell start, Cell end);
 
 #endif

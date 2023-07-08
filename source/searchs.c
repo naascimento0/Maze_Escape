@@ -4,6 +4,7 @@
 #include <math.h>
 #include "searchs.h"
 #include "data_structures/deque.h"
+#include "data_structures/stack.h"
 
 SearchResultData search_result_data_create(){
 	SearchResultData search_result;
@@ -25,6 +26,28 @@ Cell* cell_construct(int x, int y, void *parent){
 	c->y = y;
 	c->parent = parent;
 	return c;
+}
+
+SearchResultData reverse_search_result_path(SearchResultData search_result){
+	Stack *s = stack_construct();
+	int i;
+	for(i = 0; i < search_result.path_length; i++){
+		Cell temp = search_result.path[i];
+		Cell *aux = malloc(sizeof(Cell));
+		aux->x = temp.x;
+		aux->y = temp.y;
+		stack_push(s, aux);
+	}
+
+	for(i = 0; i < search_result.path_length; i++){
+		Cell *aux = stack_pop(s);
+		Cell temp = {aux->x, aux->y};
+		search_result.path[i] = temp;
+		free(aux);
+	}
+
+	stack_destroy(s);
+	return search_result;
 }
 
 // SearchResult a_star_search(Maze *m, Cell start, Cell end){
@@ -50,10 +73,12 @@ SearchResultData breadth_first_search(Maze *m, Cell start, Cell end){
 		maze_set_cell(m, cell->x, cell->y, EXPANDED);
 		search_result.expanded_nodes++;
 
-		if(allocated_size == search_result.expanded_nodes){
+		if(allocated_size <= search_result.expanded_nodes){
 			allocated_size *= 2;
 			expanded_cells_array = realloc(expanded_cells_array, allocated_size * sizeof(Cell*));
 		}
+
+		expanded_cells_array[search_result.expanded_nodes - 1] = cell;
 
 		if(cell_is_equal(*cell, end)){
 			search_result.sucess = 1;
@@ -75,13 +100,12 @@ SearchResultData breadth_first_search(Maze *m, Cell start, Cell end){
 			Cell *new_cell = cell_construct(x, y, cell);
 			deque_push_back(expand, new_cell);
 			maze_set_cell(m, new_cell->x, new_cell->y, FRONTIER);
-			expanded_cells_array[search_result.expanded_nodes - 1] = new_cell;
 		}
 	}
 	
 	if(search_result.sucess){
 		Cell *current = cell;
-		int allocated = search_result.expanded_nodes / 2;
+		int allocated = search_result.expanded_nodes / 4;
 		search_result.path = calloc(allocated, sizeof(Cell));
 
 		while(current != NULL){
@@ -100,16 +124,97 @@ SearchResultData breadth_first_search(Maze *m, Cell start, Cell end){
 		}
 	}
 
+	search_result = reverse_search_result_path(search_result);
+
 	int i;
 	for(i = 0; i < search_result.expanded_nodes; i++)
 		free(expanded_cells_array[i]);
 
+	free(expanded_cells_array);
 	deque_destroy(expand);
 	return search_result;
  }
 
-// SearchResult depth_first_search(Maze *m, Cell start, Cell end){
-//     SearchResult sr;
-//     // TODO!
-//     return sr;
-// }
+SearchResultData depth_first_search(Maze *m, Cell start, Cell end){
+	SearchResultData search_result = search_result_data_create();
+
+	int neighbours[8][2] = {{-1,0}, {-1, 1}, {0,1}, {1,1}, {1,0}, {1,-1}, {0, -1}, {-1,-1}};
+
+	Cell *cell = cell_construct(start.x, start.y, NULL);
+	Stack *adjacent_list = stack_construct();
+	stack_push(adjacent_list, cell);
+
+	int allocated_size = 40;
+	Cell **expanded_cells_array = malloc(allocated_size * sizeof(Cell*));
+
+	while(!stack_empty(adjacent_list)){
+		cell = stack_pop(adjacent_list);
+		maze_set_cell(m, cell->x, cell->y, EXPANDED);
+		search_result.expanded_nodes++;
+
+		if(allocated_size <= search_result.expanded_nodes){
+			allocated_size *= 2;
+			expanded_cells_array = realloc(expanded_cells_array, allocated_size * sizeof(Cell*));
+		}
+
+		expanded_cells_array[search_result.expanded_nodes - 1] = cell;
+
+		if(cell_is_equal(*cell, end)){
+			search_result.sucess = 1;
+			break;
+		}
+
+		int i;
+		for(i = 0; i < 8; i++){
+			int x = neighbours[i][0] + cell->x;
+			int y = neighbours[i][1] + cell->y;
+
+			if(x < 0 || x >= maze_return_rows(m) || y < 0 || y >= maze_return_cols(m))
+				continue;
+
+			int verify = maze_get_cell(m, x, y);
+			if(verify == OCCUPIED || verify == EXPANDED || verify == FRONTIER)
+				continue;
+
+			Cell *new_cell = cell_construct(x, y, cell);
+			stack_push(adjacent_list, new_cell);
+			maze_set_cell(m, new_cell->x, new_cell->y, FRONTIER);
+		}
+
+		printf("\n");maze_display(m);printf("\n");
+	}
+
+	if(search_result.sucess){
+		Cell *current = cell;
+		int allocated = search_result.expanded_nodes / 4;
+		search_result.path = calloc(allocated, sizeof(Cell));
+
+		while(current != NULL){
+			if(search_result.path_length >= allocated){
+				allocated *= 2;
+				search_result.path = realloc(search_result.path, allocated * sizeof(Cell));
+			}
+
+			Cell aux = {current->x, current->y};
+			search_result.path[search_result.path_length++] = aux;
+			Cell *parent = current->parent;
+			if(parent != NULL)
+				search_result.path_cost += sqrt((pow(current->x - parent->x, 2) + pow(current->y - parent->y, 2)));
+
+			current = current->parent;
+		}
+	}
+
+	search_result = reverse_search_result_path(search_result);
+
+	int i;
+	for(i = 0; i < search_result.expanded_nodes; i++){
+		free(expanded_cells_array[i]);
+		expanded_cells_array[i] = NULL;
+	}
+
+	free(expanded_cells_array);
+	stack_destroy(adjacent_list);
+
+     return search_result;
+ }
