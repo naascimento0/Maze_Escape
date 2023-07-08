@@ -3,21 +3,28 @@
 
 #include "maze.h"
 
-typedef struct{
+typedef struct cell{
     int x;
     int y;
+    void *parent;
 }Cell;
 
 typedef struct{
     Cell *path;
     double path_cost;
-    int path_size;
+    int path_length;
     int expanded_nodes;
     int sucess;
 }SearchResultData;
 
 
 SearchResultData search_result_data_create();
+
+int cell_is_equal(Cell a, Cell b);
+
+Cell* cell_construct(int x, int y, void *parent);
+
+SearchResultData breadth_first_search(Maze *m, Cell start, Cell end);
 
 
 #endif
