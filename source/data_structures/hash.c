@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "hash.h" //MANDAR HASH NOVAMENTE
+#include "hash.h"
 
 struct HashTable{
     ForwardList **buckets;

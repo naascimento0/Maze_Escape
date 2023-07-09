@@ -20,7 +20,7 @@ void display_result(SearchResultData *search_result)
     printf("%d\n", search_result->expanded_nodes);
 }
 
-void show_entire_path(Maze *m, SearchResultData *search, Cell end, Cell start)
+void show_entire_path(Maze *m, SearchResultData *search, Cell start, Cell end)
 {
     if (search->sucess)
     {
@@ -30,7 +30,7 @@ void show_entire_path(Maze *m, SearchResultData *search, Cell end, Cell start)
 
     maze_set_cell(m, start.x, start.y, START);
     maze_set_cell(m, end.x, end.y, END);
-    //maze_display(m);
+   // maze_display(m);
 }
 
 int main()
@@ -52,8 +52,8 @@ int main()
     	search_result = breadth_first_search(maze, start, end);
     else if (!strcmp(algorithm, "DFS"))
     	search_result = depth_first_search(maze, start, end);
-//    else if (!strcmp(algorithm, "A*"))
-//    	search_result = a_star(maze, start, end);
+    else if (!strcmp(algorithm, "A*"))
+    	search_result = a_star_search(maze, start, end);
     else
     {
         printf("Unknown Algorithm: %s\n", algorithm);

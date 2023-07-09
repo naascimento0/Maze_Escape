@@ -154,7 +154,6 @@ void heap_heapify_down(Heap *heap, int parent){
 }
 
 void heap_destroy(Heap *heap){
-
 	int i;
 	for(i = 0; i < heap->size; i++){
 		free(heap->nodes[i]);
