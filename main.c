@@ -8,7 +8,7 @@ void display_result(SearchResultData *search_result)
 {
     if (!search_result->sucess)
     {
-        printf("IMPOSSIBLE\n");
+        printf("IMPOSSIVEL\n");
         return;
     }
 
@@ -25,11 +25,11 @@ void show_entire_path(Maze *m, SearchResultData *search, Cell end, Cell start)
     if (search->sucess)
     {
         for (int i = 0; i < search->path_length; i++)
-        	maze_set_cell(m, search->path[i].y, search->path[i].x, PATH);
+        	maze_set_cell(m, search->path[i].x, search->path[i].y, PATH);
     }
 
-    maze_set_cell(m, start.y, start.x, START);
-    maze_set_cell(m, end.y, end.x, END);
+    maze_set_cell(m, start.x, start.y, START);
+    maze_set_cell(m, end.x, end.y, END);
     //maze_display(m);
 }
 

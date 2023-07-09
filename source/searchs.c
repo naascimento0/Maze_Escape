@@ -41,7 +41,7 @@ SearchResultData reverse_search_result_path(SearchResultData search_result){
 
 	for(i = 0; i < search_result.path_length; i++){
 		Cell *aux = stack_pop(s);
-		Cell temp = {aux->x, aux->y};
+		Cell temp = {aux->x, aux->y, NULL};
 		search_result.path[i] = temp;
 		free(aux);
 	}
@@ -50,11 +50,11 @@ SearchResultData reverse_search_result_path(SearchResultData search_result){
 	return search_result;
 }
 
-// SearchResult a_star_search(Maze *m, Cell start, Cell end){
-//     SearchResult sr;
-//     // TODO!
-//     return sr;
-// }
+SearchResultData a_star_search(Maze *m, Cell start, Cell end){
+	 SearchResultData search_result = search_result_data_create();
+
+     return search_result;
+ }
 
 SearchResultData breadth_first_search(Maze *m, Cell start, Cell end){
 	SearchResultData search_result = search_result_data_create();
@@ -114,7 +114,7 @@ SearchResultData breadth_first_search(Maze *m, Cell start, Cell end){
 				search_result.path = realloc(search_result.path, allocated * sizeof(Cell));
 			}
 
-			Cell aux = {current->x, current->y};
+			Cell aux = {current->x, current->y, NULL};
 			search_result.path[search_result.path_length++] = aux;
 			Cell *parent = current->parent;
 			if(parent != NULL)
@@ -122,9 +122,9 @@ SearchResultData breadth_first_search(Maze *m, Cell start, Cell end){
 
 			current = current->parent;
 		}
-	}
 
-	search_result = reverse_search_result_path(search_result);
+		search_result = reverse_search_result_path(search_result);
+	}
 
 	int i;
 	for(i = 0; i < search_result.expanded_nodes; i++)
@@ -135,20 +135,21 @@ SearchResultData breadth_first_search(Maze *m, Cell start, Cell end){
 	return search_result;
  }
 
+
 SearchResultData depth_first_search(Maze *m, Cell start, Cell end){
 	SearchResultData search_result = search_result_data_create();
 
 	int neighbours[8][2] = {{-1,0}, {-1, 1}, {0,1}, {1,1}, {1,0}, {1,-1}, {0, -1}, {-1,-1}};
 
 	Cell *cell = cell_construct(start.x, start.y, NULL);
-	Stack *adjacent_list = stack_construct();
-	stack_push(adjacent_list, cell);
+	Deque *expand = deque_construct();
+	deque_push_front(expand, cell);
 
 	int allocated_size = 40;
 	Cell **expanded_cells_array = malloc(allocated_size * sizeof(Cell*));
 
-	while(!stack_empty(adjacent_list)){
-		cell = stack_pop(adjacent_list);
+	while(deque_size(expand)){
+		cell = deque_pop_front(expand);
 		maze_set_cell(m, cell->x, cell->y, EXPANDED);
 		search_result.expanded_nodes++;
 
@@ -177,11 +178,9 @@ SearchResultData depth_first_search(Maze *m, Cell start, Cell end){
 				continue;
 
 			Cell *new_cell = cell_construct(x, y, cell);
-			stack_push(adjacent_list, new_cell);
+			deque_push_front(expand, new_cell);
 			maze_set_cell(m, new_cell->x, new_cell->y, FRONTIER);
 		}
-
-		printf("\n");maze_display(m);printf("\n");
 	}
 
 	if(search_result.sucess){
@@ -195,7 +194,7 @@ SearchResultData depth_first_search(Maze *m, Cell start, Cell end){
 				search_result.path = realloc(search_result.path, allocated * sizeof(Cell));
 			}
 
-			Cell aux = {current->x, current->y};
+			Cell aux = {current->x, current->y, NULL};
 			search_result.path[search_result.path_length++] = aux;
 			Cell *parent = current->parent;
 			if(parent != NULL)
@@ -203,18 +202,97 @@ SearchResultData depth_first_search(Maze *m, Cell start, Cell end){
 
 			current = current->parent;
 		}
-	}
 
-	search_result = reverse_search_result_path(search_result);
+		search_result = reverse_search_result_path(search_result);
+	}
 
 	int i;
-	for(i = 0; i < search_result.expanded_nodes; i++){
+	for(i = 0; i < search_result.expanded_nodes; i++)
 		free(expanded_cells_array[i]);
-		expanded_cells_array[i] = NULL;
-	}
 
 	free(expanded_cells_array);
-	stack_destroy(adjacent_list);
-
-     return search_result;
+	deque_destroy(expand);
+	return search_result;
  }
+
+
+//SearchResultData depth_first_search(Maze *m, Cell start, Cell end){
+//	SearchResultData search_result = search_result_data_create();
+//
+//	int neighbours[8][2] = {{-1,0}, {-1, 1}, {0,1}, {1,1}, {1,0}, {1,-1}, {0, -1}, {-1,-1}};
+//
+//	Cell *cell = cell_construct(start.x, start.y, NULL);
+//	Stack *adjacent_list = stack_construct();
+//	stack_push(adjacent_list, cell);
+//
+//	int allocated_size = 40;
+//	Cell **frontier_cells = calloc(allocated_size, sizeof(Cell*));
+//	int count = 0;
+//	frontier_cells[count++] = cell;
+//
+//	while(!stack_empty(adjacent_list)){
+//		cell = stack_pop(adjacent_list);
+//		maze_set_cell(m, cell->x, cell->y, EXPANDED);
+//		search_result.expanded_nodes++;
+//
+//		if(cell_is_equal(*cell, end)){
+//			search_result.sucess = 1;
+//			break;
+//		}
+//
+//		int i;
+//		for(i = 0; i < 8; i++){
+//			int x = neighbours[i][0] + cell->x;
+//			int y = neighbours[i][1] + cell->y;
+//
+//			if(x < 0 || x >= maze_return_rows(m) || y < 0 || y >= maze_return_cols(m))
+//				continue;
+//
+//			int verify = maze_get_cell(m, x, y);
+//			if(verify == OCCUPIED || verify == EXPANDED || verify == FRONTIER)
+//				continue;
+//
+//			Cell *new_cell = cell_construct(x, y, cell);
+//			stack_push(adjacent_list, new_cell);
+//			maze_set_cell(m, new_cell->x, new_cell->y, FRONTIER);
+//
+//			if(allocated_size <= count){
+//				allocated_size *= 2;
+//				frontier_cells = realloc(frontier_cells, allocated_size * sizeof(Cell*));
+//			}
+//
+//			frontier_cells[count++] = new_cell;
+//		}
+//	}
+//
+//	if(search_result.sucess){
+//		Cell *current = cell;
+//		int allocated = search_result.expanded_nodes / 4;
+//		search_result.path = calloc(allocated, sizeof(Cell));
+//
+//		while(current != NULL){
+//			if(search_result.path_length >= allocated){
+//				allocated *= 2;
+//				search_result.path = realloc(search_result.path, allocated * sizeof(Cell));
+//			}
+//
+//			Cell aux = {current->x, current->y};
+//			search_result.path[search_result.path_length++] = aux;
+//			Cell *parent = current->parent;
+//			if(parent != NULL)
+//				search_result.path_cost += sqrt((pow(current->x - parent->x, 2) + pow(current->y - parent->y, 2)));
+//
+//			current = current->parent;
+//		}
+//	}
+//
+//	search_result = reverse_search_result_path(search_result);
+//
+//	int i;
+//	for(i = 0; i < count; i++)
+//		free(frontier_cells[i]);
+//
+//	free(frontier_cells);
+//	stack_destroy(adjacent_list);
+//	return search_result;
+// }
